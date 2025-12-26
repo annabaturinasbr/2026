@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Что тебя ждёт в 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #1b1b1b, #000);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 420px;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    .slot {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .reel {
+      width: 80px;
+      height: 80px;
+      background: #111;
+      border-radius: 16px;
+      font-size: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    button {
+      font-size: 18px;
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff8a00, #ff3d00);
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .result {
+      font-size: 18px;
+      min-height: 72px;
+      line-height: 1.4;
+    }
+
+    .jackpot {
+      animation: glow 1s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff9800; }
+      to { text-shadow: 0 0 20px #ff5722; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Нажми на кнопку и узнай,<br>что тебя ждёт в 2026</h1>
+
+    <div class="slot">
+      <div class="reel" id="reel1">❓</div>
+      <div class="reel" id="reel2">❓</div>
+      <div class="reel" id="reel3">❓</div>
+    </div>
+
+    <button id="spinBtn">🎰 Нажать</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const emojis = ["🙏", "💐", "🥰", "👀", "⭐️", "☕️", "🔥"];
+    const jackpotChance = 0.3;
+
+    const jackpots = {
+      "🙏": "Павел Дуров скинет тебе деняк",
+      "💐": "Каждая бабуля, которая встретится тебе на пути, будет говорить тебе только комплименты",
+      "🥰": "Ты найдёшь сто тыщ в старой зимней куртке",
+      "👀": "На тебя подпишется Артемий Лебедев",
+      "⭐️": "Все твои решения по работе не будут подвергаться сомнению, и тебе не придётся ждать согласований месяцами",
+      "☕️": "Ты сможешь предсказывать будущее по кофейной пенке",
+      "🔥": "Ты выиграешь в лотерею годовой абонемент в спа около дома"
+    };
+
+    const mixedPredictions = [
+      "Ты купишь вкусный арбуз не в сезон",
+      "Каждый второй понедельник месяца будет супер",
+      "Ты встретишь свою судьбу",
+      "Ты заведёшь 5 котов",
+      "Тебе вернут долг, про который ты уже не помнишь",
+      "Ты перестанешь себя обманывать и наконец-то станешь пасечником",
+      "Тебе попадётся редкая лабуба (или что там будет на хайпе)",
+      "У тебя будет пожизненная скидка на фисташки"
+    ];
+
+    const reels = [
+      document.getElementById("reel1"),
+      document.getElementById("reel2"),
+      document.getElementById("reel3")
+    ];
+
+    const resultEl = document.getElementById("result");
+    const button = document.getElementById("spinBtn");
+
+    function randomEmoji() {
+      return emojis[Math.floor(Math.random() * emojis.length)];
+    }
+
+    function spin() {
+      button.disabled = true;
+      resultEl.textContent = "";
+      resultEl.classList.remove("jackpot");
+
+      const isJackpot = Math.random() < jackpotChance;
+      let final;
+
+      if (isJackpot) {
+        const e = randomEmoji();
+        final = [e, e, e];
+      } else {
+        do {
+          final = [randomEmoji(), randomEmoji(), randomEmoji()];
+        } while (final[0] === final[1] && final[1] === final[2]);
+      }
+
+      let i = 0;
+      const interval = setInterval(() => {
+        reels.forEach(r => r.textContent = randomEmoji());
+        i++;
+        if (i > 12) {
+          clearInterval(interval);
+          reels.forEach((r, idx) => r.textContent = final[idx]);
+          showResult(final);
+          button.disabled = false;
+        }
+      }, 80);
+    }
+
+    function showResult(arr) {
+      if (arr[0] === arr[1] && arr[1] === arr[2]) {
+        resultEl.textContent = jackpots[arr[0]];
+        resultEl.classList.add("jackpot");
+      } else {
+        const text = mixedPredictions[Math.floor(Math.random() * mixedPredictions.length)];
+        resultEl.textContent = text;
+      }
+    }
+
+    button.addEventListener("click", spin);
+  </script>
+</body>
+</html>
